@@ -34,16 +34,13 @@ class Bingo:
     def find_number_on_board(self, number: int) -> dict[int, list[int]]:
         boards_found = {}
         for board_number, board in self.boards.items():
-            for index, row in enumerate(board):
-                try:
-                    row.index(number)
-                    if not boards_found.get(board_number):
-                        boards_found[board_number] = []
-                    boards_found[board_number].append(
-                        {"row": index, "column": row.index(number)}
-                    )
-                except ValueError:
-                    pass
+            for i in range(5):
+                for j in range(5):
+                    if board[i][j] == number:
+                        if not boards_found.get(board_number):
+                            boards_found[board_number] = []
+                        boards_found[board_number].append({"row": i, "column": j})
+
         return boards_found
 
     def scan_column(self, board: list[list[int]], board_number):
@@ -52,14 +49,11 @@ class Bingo:
             for j in range(5):
                 if board[j][i] == -1:
                     column.append(-1)
+                    if len(column) == 5:
+                        print(f"Board {board_number} has 5 in a column!")
+                        return board
                 else:
                     column = []
-
-        if len(column) == 5:
-            print(f"Board {board_number} has 5 in a column!")
-            return board
-        else:
-            return None
 
     def play(self):
         for bingo_number in self.input:
@@ -70,32 +64,32 @@ class Bingo:
                     column_number = location["column"]
                     self.boards[board_number][row_number][column_number] = -1
 
-                if self.scan_column(self.boards[board_number], board_number):
-                    print(f"Winning number: {bingo_number}")
-                    print(f"Board {board_number} won!")
-                    return {
-                        "winning_number": bingo_number,
-                        "board": self.boards[board_number],
-                    }
+                    if self.scan_column(self.boards[board_number], board_number):
+                        print(f"Winning number: {bingo_number}")
+                        print(f"Board {board_number} won!")
+                        return {
+                            "winning_number": bingo_number,
+                            "board": self.boards[board_number],
+                        }
 
-                if (
-                    len(
-                        [
-                            tile
-                            for tile in self.boards[board_number][row_number]
-                            if tile == -1
-                        ]
-                    )
-                    == 5
-                ):
-                    print(f"Winning number: {bingo_number}")
-                    print(
-                        f"Board {board_number}, row {location['row'] + 1} got the bingo!"
-                    )
-                    return {
-                        "winning_number": bingo_number,
-                        "board": self.boards[board_number],
-                    }
+                    if (
+                        len(
+                            [
+                                tile
+                                for tile in self.boards[board_number][row_number]
+                                if tile == -1
+                            ]
+                        )
+                        == 5
+                    ):
+                        print(f"Winning number: {bingo_number}")
+                        print(
+                            f"Board {board_number}, row {location['row'] + 1} got the bingo!"
+                        )
+                        return {
+                            "winning_number": bingo_number,
+                            "board": self.boards[board_number],
+                        }
 
 
 if __name__ == "__main__":
